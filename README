@@ -1,0 +1,8 @@
+$ bazel build :remote :local
+
+$ cat bazel-bin/remote_version.txt 
+/usr/bin/python3.6
+
+$ cat bazel-bin/local_version.txt 
+/usr/bin/python3.7
+
