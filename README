@@ -4,5 +4,9 @@ $ cat bazel-bin/remote_version.txt
 /usr/bin/python3.6
 
 $ cat bazel-bin/local_version.txt 
-/usr/bin/python3.7
+/usr/bin/python3.6
+
+The way to get those to be different is to pin the py_binary to
+exec_compatible_with = [":local_python"], but that doesn't work as it can't
+find a good C++ toolchain.
 
