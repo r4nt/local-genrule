@@ -10,5 +10,5 @@ py_repositories()
 load("@rules_python//python:pip.bzl", "pip_repositories")
 pip_repositories()
 
-register_toolchains("//:local_python_toolchain")
 register_toolchains("//:remote_python_toolchain")
+register_toolchains("//:local_python_toolchain")
