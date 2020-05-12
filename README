@@ -1,12 +1,16 @@
-$ bazel build :remote :local
+$ bzl build remote_version.txt local_version.txt --toolchain_resolution_debug
 
 $ cat bazel-bin/remote_version.txt 
 /usr/bin/python3.6
 
 $ cat bazel-bin/local_version.txt 
-/usr/bin/python3.6
+/usr/bin/python3.7
 
-The way to get those to be different is to pin the py_binary to
-exec_compatible_with = [":local_python"], but that doesn't work as it can't
-find a good C++ toolchain.
+This currently works due to to "py_script" having:
+exec_compatible_with = [":local_value"]
 
+Removing exec_compatible_with leads to it selecting the autodetecting-python-
+toolchain; in case of our TF setup, the remote setup.
+
+The desired behavior is to allow not tagging py_script with
+exec_compatible_with, and it still using the local toolchain.
