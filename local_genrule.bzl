@@ -35,4 +35,5 @@ def local_genrule(name, out, exec_tool):
     name = name,
     out = out,
     exec_tool = exec_tool,
+    exec_compatible_with = ["//:local_value"],
   )

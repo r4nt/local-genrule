@@ -7,7 +7,7 @@ py_binary(
   main = "script.py",
   python_version = "PY3",
   srcs_version = "PY3",
-  exec_compatible_with = [":remote_value"],
+  exec_compatible_with = [":local_value"],
 )
 
 local_genrule(
@@ -53,13 +53,21 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
 
-#genrule(
-#  name = "remote",
-#  cmd = "$(location //:py_script) $@",
-#  outs = ["remote_version.txt"],
-#  exec_tools = ["//:py_script"],
-#)
-#
+py_binary(
+    name = "remote_script",
+    srcs = ["script.py"],
+    main = "script.py",
+    python_version = "PY3",
+    srcs_version = "PY3",
+)
+
+genrule(
+  name = "remote",
+  cmd = "$(location //:remote_script) $@",
+  outs = ["remote_version.txt"],
+  exec_tools = ["//:remote_script"],
+)
+
 constraint_setting(
     name = "remote_setting"
 )
@@ -76,6 +84,10 @@ platform(
     "@platforms//cpu:x86_64",
     ":remote_value",
   ],
+  exec_properties = {
+      "Pool": "default",
+      "container-image": "docker://",
+      },
 )
 
 py_runtime(
