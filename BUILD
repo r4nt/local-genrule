@@ -7,6 +7,7 @@ py_binary(
   main = "script.py",
   python_version = "PY3",
   srcs_version = "PY3",
+  exec_compatible_with = [":remote_value"],
 )
 
 local_genrule(
@@ -15,16 +16,13 @@ local_genrule(
   out = "local_version.txt",
 )
 
-genrule(
-  name = "remote",
-  cmd = "$(location //:py_script) $@",
-  outs = ["remote_version.txt"],
-  exec_tools = ["//:py_script"],
+constraint_setting(
+    name = "local_setting"
 )
 
 constraint_value(
-    name = "local_python",
-    constraint_setting = "@bazel_tools//tools/python:py3_interpreter_path",
+    name = "local_value",
+    constraint_setting = ":local_setting",
 )
 
 platform(
@@ -32,7 +30,7 @@ platform(
   constraint_values = [
     "@platforms//os:linux",
     "@platforms//cpu:x86_64",
-    ":local_python",
+    ":local_value",
   ],
 )
 
@@ -48,12 +46,36 @@ py_runtime_pair(
 )
 
 toolchain(
-    name = "local_python_toolchain",
-    target_compatible_with = [
-        ":local_python",
-    ],
+    name = "local_toolchain",
+    target_compatible_with = [":local_value" ],
+    exec_compatible_with = [":local_value" ],
     toolchain = ":local_runtime",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
+)
+
+#genrule(
+#  name = "remote",
+#  cmd = "$(location //:py_script) $@",
+#  outs = ["remote_version.txt"],
+#  exec_tools = ["//:py_script"],
+#)
+#
+constraint_setting(
+    name = "remote_setting"
+)
+
+constraint_value(
+    name = "remote_value",
+    constraint_setting = ":remote_setting",
+)
+
+platform(
+  name = "remote_platform",
+  constraint_values = [
+    "@platforms//os:linux",
+    "@platforms//cpu:x86_64",
+    ":remote_value",
+  ],
 )
 
 py_runtime(
@@ -68,7 +90,9 @@ py_runtime_pair(
 )
 
 toolchain(
-    name = "remote_python_toolchain",
+    name = "remote_toolchain",
+    target_compatible_with = [":remote_value" ],
+    exec_compatible_with = [":remote_value" ],
     toolchain = ":remote_runtime",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
